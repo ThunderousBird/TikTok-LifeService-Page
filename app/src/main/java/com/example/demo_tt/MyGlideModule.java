@@ -12,22 +12,26 @@ import com.bumptech.glide.load.engine.cache.LruResourceCache;
 import com.bumptech.glide.load.engine.cache.MemorySizeCalculator;
 import com.bumptech.glide.module.AppGlideModule;
 
+@GlideModule
 public class MyGlideModule extends AppGlideModule {
 
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
-        // 计算推荐的缓存大小
+        android.util.Log.d("GlideConfig", "========================================");
+        android.util.Log.d("GlideConfig", "MyGlideModule 已加载！");
+        android.util.Log.d("GlideConfig", "========================================");
+        // 计算推荐缓存大小
         MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context).setMemoryCacheScreens(2).build();
 
-        // 设置内存缓存大小
+        // 设置内存缓存
         int memoryCacheSize = calculator.getMemoryCacheSize();
         builder.setMemoryCache(new LruResourceCache(memoryCacheSize));
 
-        // 设置磁盘缓存大小
+        // 设置磁盘缓存
         int diskCacheSizeBytes = 1024 * 1024 * 250;  // MB
         builder.setDiskCache(new InternalCacheDiskCacheFactory(context, diskCacheSizeBytes));
-
-        // builder.setLogLevel(Log.DEBUG);
+        android.util.Log.d("GlideConfig", "内存缓存大小: " + (memoryCacheSize / 1024 / 1024) + " MB");
+        android.util.Log.d("GlideConfig", "磁盘缓存大小: 250 MB");
     }
 
     @Override
