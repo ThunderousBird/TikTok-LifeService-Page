@@ -1,5 +1,6 @@
 package com.example.demo_tt;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +34,15 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import android.graphics.drawable.Drawable;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import androidx.annotation.Nullable;
 
 import java.util.List;
 import java.util.Collections;
@@ -138,16 +148,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        // 长按显示当前模式
-//        fabSwitchLayout.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                String mode = currentSpanCount == 1 ? "单列" : "双列";
-////                Toast.makeText(MainActivity.this, "当前：" + mode, Toast.LENGTH_SHORT).show();
-//                return true;
-//            }
-//        });
     }
 
     // 切换单列
@@ -463,9 +463,8 @@ public class MainActivity extends AppCompatActivity {
 
     private class SmartPreloadScrollListener extends RecyclerView.OnScrollListener {
         private int lastVisiblePosition = 0;
-        private int scrollDirection = 0;
         private static final int PRELOAD_IMAGE_COUNT = 8;
-        private static final int LOAD_MORE_THRESHOLD  = 4;
+        private static final int LOAD_MORE_THRESHOLD = 4;
 
         private int getMinPosition(int[] positions) {
             if (positions == null || positions.length == 0) {
@@ -499,43 +498,23 @@ public class MainActivity extends AppCompatActivity {
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
-            // 获取当前位置
-            int[] firstPositions = layoutManager.findFirstVisibleItemPositions(null);
             int[] lastPositions = layoutManager.findLastVisibleItemPositions(null);
-
-            if (firstPositions == null || lastPositions == null) {
-                return;
+            if (lastPositions != null && lastPositions.length > 0) {
+                lastVisiblePosition = getMaxPosition(lastPositions);
             }
-
-            if (firstPositions.length == 0 || lastPositions.length == 0) {
-                return;
-            }
-
-            int currentFirstPosition = getMinPosition(firstPositions);
-            int currentLastPosition = getMaxPosition(lastPositions);
-
-            // 判断滚动方向
-            if (currentLastPosition > lastVisiblePosition) {
-                scrollDirection = 1;
-                onScrollDown(currentLastPosition);
-            } else if (currentFirstPosition < lastVisiblePosition) {
-                scrollDirection = -1;
-                onScrollUp(currentFirstPosition);
-            }
-
-            lastVisiblePosition = currentLastPosition;
         }
 
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
 
+            // 停止滚动时预加载
             if (newState == RecyclerView.SCROLL_STATE_IDLE && !isLoading) {
+                preloadImagesAhead(lastVisiblePosition, PRELOAD_IMAGE_COUNT);
                 int[] lastPositions = layoutManager.findLastCompletelyVisibleItemPositions(null);
                 if (lastPositions != null) {
                     int lastPosition = getMaxPosition(lastPositions);
 
-                    // 距离底部小于阈值时，加载数据
                     if (lastPosition >= adapter.getItemCount() - LOAD_MORE_THRESHOLD) {
                         loadMoreData();
                     }
@@ -566,12 +545,8 @@ public class MainActivity extends AppCompatActivity {
                         })
                         .preload();
             } catch (Exception e) {
-                android.util.Log.w("Preload", "预加载失败: " + url);
+                android.util.Log.w("Preload", "预加载异常: " + url);
             }
-        }
-
-        private void onScrollDown(int currentLastPosition) {
-            preloadImagesAhead(currentLastPosition, PRELOAD_IMAGE_COUNT);
         }
 
         private void preloadImagesAhead(int currentPosition, int count) {
@@ -582,42 +557,15 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
 
-                // 获取预加载数据
                 ExperienceCard card = adapter.getItem(preloadPosition);
                 if (card == null) {
                     continue;
                 }
-
-                preloadImage(card.getImageUrl(), 400, card.getImageHeight()); // 主图
-
-
-                preloadImage(card.getUserAvatar(), 100, 100); // 头像
-            }
-        }
-
-        // 上滑加载 与前面相同
-        private void onScrollUp(int currentFirstPosition) {
-             preloadImagesBefore(currentFirstPosition, 3);
-        }
-
-        private void preloadImagesBefore(int currentPosition, int count) {
-            for (int i = 1; i <= count; i++) {
-                int preloadPosition = currentPosition + i;
-
-                if (preloadPosition >= adapter.getItemCount()) {
-                    break;
-                }
-
-                ExperienceCard card = adapter.getItem(preloadPosition);
-                if (card == null) {
-                    continue;
-                }
-
+                // 主图
                 preloadImage(card.getImageUrl(), 400, card.getImageHeight());
-
+                // 头像
                 preloadImage(card.getUserAvatar(), 100, 100);
             }
         }
-
     }
 }

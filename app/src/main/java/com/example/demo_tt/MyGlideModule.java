@@ -1,6 +1,7 @@
 package com.example.demo_tt;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
@@ -20,8 +21,11 @@ public class MyGlideModule extends AppGlideModule {
         android.util.Log.d("GlideConfig", "========================================");
         android.util.Log.d("GlideConfig", "MyGlideModule 已加载！");
         android.util.Log.d("GlideConfig", "========================================");
-        // 计算推荐缓存大小
-        MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context).setMemoryCacheScreens(2).build();
+        // 计算缓存大小
+        MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
+                .setMemoryCacheScreens(2)
+                .setBitmapPoolScreens(3)
+                .build();
 
         // 设置内存缓存
         int memoryCacheSize = calculator.getMemoryCacheSize();

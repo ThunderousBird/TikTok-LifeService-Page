@@ -9,7 +9,8 @@
     app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="@android:color/transparent">
 
     <!-- 整体垂直布局 -->
     <LinearLayout
