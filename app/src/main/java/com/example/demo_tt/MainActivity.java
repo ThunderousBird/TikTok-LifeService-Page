@@ -537,7 +537,6 @@ public class MainActivity extends AppCompatActivity {
 
                             @Override
                             public void onLoadCleared(@Nullable Drawable placeholder) {
-                                // 不用管，Glide会管理生命周期
                             }
 
                             @Override

@@ -102,20 +102,15 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
         }
 
         // 头像
-        Bitmap avatarBitmap = BitmapPreloadCache.get(avatarUrl);
-        if (avatarBitmap != null && !avatarBitmap.isRecycled()) {
-            holder.userAvatar.setImageBitmap(avatarBitmap);
-            android.util.Log.d("PreBitmap", "使用Bitmap: " + avatarUrl);
-        } else {
-            Glide.with(context)
-                    .load(avatarUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .override(100, 100)
-                    .circleCrop()
-                    .placeholder(android.R.color.darker_gray)
-                    .into(holder.userAvatar);
-            android.util.Log.d("PreBitmap", "正常加载: " + avatarUrl);
-        }
+        Glide.with(context)
+            .load(card.getUserAvatar())
+            .placeholder(android.R.color.darker_gray)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .skipMemoryCache(false)
+            .override(100, 100)  // 固定size
+            .circleCrop()
+            .dontAnimate()
+            .into(holder.userAvatar);
 
         // 文字部分
         holder.title.setText(card.getTitle());
