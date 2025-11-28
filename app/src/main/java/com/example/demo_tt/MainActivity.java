@@ -35,14 +35,10 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import android.graphics.drawable.Drawable;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
+import android.graphics.Bitmap;
 import androidx.annotation.Nullable;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import java.util.List;
 import java.util.Collections;
@@ -522,28 +518,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // 预加载图片
-        private void preloadImage(String url, int width, int height) {
+        private void preloadImage(final String url, int width, int height) {
             try {
                 Glide.with(MainActivity.this)
+                        .asBitmap() // 解码成 Bitmap
                         .load(url)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .override(width, height)
-                        .listener(new RequestListener<Drawable>() {
+                        .into(new CustomTarget<Bitmap>() {
                             @Override
-                            public boolean onResourceReady(Drawable resource, Object model,
-                                                           Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                android.util.Log.d("Preload", "预加载成功: " + url);
-                                return false;
+                            public void onResourceReady(
+                                    Bitmap resource,
+                                    @Nullable Transition<? super Bitmap> transition) {
+
+                                BitmapPreloadCache.put(url, resource);
+                                android.util.Log.d("Preload", "预加载成功(BITMAP): " + url);
                             }
+
                             @Override
-                            public boolean onLoadFailed(GlideException e, Object model,
-                                                        Target<Drawable> target, boolean isFirstResource) {
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                                // 不用管，Glide会管理生命周期
+                            }
+
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 android.util.Log.e("Preload", "预加载失败: " + url);
-                                return false;
                             }
-                        })
-                        .preload();
+                        });
+
             } catch (Exception e) {
                 android.util.Log.w("Preload", "预加载异常: " + url);
             }

@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.core.content.ContextCompat;
 import android.graphics.PorterDuff;
 
+import android.graphics.Bitmap;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
@@ -81,27 +83,40 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
         params.height = card.getImageHeight();
         holder.cardImage.setLayoutParams(params);
 
-        // 加载主图片
-        Glide.with(context)
-            .load(card.getImageUrl())
-            .placeholder(android.R.color.darker_gray)
-            .error(android.R.drawable.ic_dialog_alert)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)  // 缓存所有版本
-            .skipMemoryCache(false)  // 使用内存缓存
-            .override(500, card.getImageHeight())
-            .dontAnimate()  // 滑动时禁用动画，减少卡顿
-            .into(holder.cardImage);
+        String imageUrl = card.getImageUrl();
+        String avatarUrl = card.getUserAvatar();
 
-        // 加载头像
-        Glide.with(context)
-            .load(card.getUserAvatar())
-            .placeholder(android.R.color.darker_gray)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .skipMemoryCache(false)
-            .override(100, 100)  // 固定size
-            .circleCrop()
-            .dontAnimate()
-            .into(holder.userAvatar);
+        // 优先用Bitmap 主图
+        Bitmap preBitmap = BitmapPreloadCache.get(imageUrl);
+        if (preBitmap != null && !preBitmap.isRecycled()) {
+            holder.cardImage.setImageBitmap(preBitmap);
+            android.util.Log.d("PreBitmap", "使用Bitmap: " + imageUrl);
+        } else {
+            // 兜底：正常Glide加载
+            Glide.with(context)
+                    .load(imageUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .override(500, card.getImageHeight())
+                    .placeholder(android.R.color.darker_gray)
+                    .into(holder.cardImage);
+            android.util.Log.d("PreBitmap", "正常加载: " + imageUrl);
+        }
+
+        // 头像
+        Bitmap avatarBitmap = BitmapPreloadCache.get(avatarUrl);
+        if (avatarBitmap != null && !avatarBitmap.isRecycled()) {
+            holder.userAvatar.setImageBitmap(avatarBitmap);
+            android.util.Log.d("PreBitmap", "使用Bitmap: " + avatarUrl);
+        } else {
+            Glide.with(context)
+                    .load(avatarUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .override(100, 100)
+                    .circleCrop()
+                    .placeholder(android.R.color.darker_gray)
+                    .into(holder.userAvatar);
+            android.util.Log.d("PreBitmap", "正常加载: " + avatarUrl);
+        }
 
         // 文字部分
         holder.title.setText(card.getTitle());
