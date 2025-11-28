@@ -86,13 +86,12 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
         String imageUrl = card.getImageUrl();
         String avatarUrl = card.getUserAvatar();
 
-        // 优先用Bitmap 主图
+        // 从Bitmap加载 主图
         Bitmap preBitmap = BitmapPreloadCache.get(imageUrl);
         if (preBitmap != null && !preBitmap.isRecycled()) {
             holder.cardImage.setImageBitmap(preBitmap);
             android.util.Log.d("PreBitmap", "使用Bitmap: " + imageUrl);
         } else {
-            // 兜底：正常Glide加载
             Glide.with(context)
                     .load(imageUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
