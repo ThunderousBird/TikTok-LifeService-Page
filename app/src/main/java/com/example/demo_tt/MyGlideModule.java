@@ -18,9 +18,7 @@ public class MyGlideModule extends AppGlideModule {
 
     @Override
     public void applyOptions(@NonNull Context context, @NonNull GlideBuilder builder) {
-        android.util.Log.d("GlideConfig", "========================================");
         android.util.Log.d("GlideConfig", "MyGlideModule 已加载！");
-        android.util.Log.d("GlideConfig", "========================================");
         // 计算缓存大小
         MemorySizeCalculator calculator = new MemorySizeCalculator.Builder(context)
                 .setMemoryCacheScreens(2)
