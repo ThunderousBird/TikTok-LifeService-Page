@@ -42,9 +42,9 @@ public class PreMainActivate extends AppCompatActivity{
     }
 
     private void startPreloading() {
-        if (!NetWork.isNetworkAvailable(this)) {
-            return;
-        }
+//        if (!NetWork.isNetworkAvailable(this)) {
+//            return;
+//        }
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -408,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
 //                            Toast.LENGTH_SHORT).show();
 //                }
             }
-        }, 100);
+        }, 50);
     }
 
     // 加载更多数据
@@ -521,29 +521,29 @@ public class MainActivity extends AppCompatActivity {
         private void preloadImage(final String url, int width, int height) {
             try {
                 Glide.with(MainActivity.this)
-                        .asBitmap() // 解码成 Bitmap
-                        .load(url)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .override(width, height)
-                        .into(new CustomTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(
-                                    Bitmap resource,
-                                    @Nullable Transition<? super Bitmap> transition) {
+                    .asBitmap() // 解码成 Bitmap
+                    .load(url)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .override(width, height)
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(
+                                Bitmap resource,
+                                @Nullable Transition<? super Bitmap> transition) {
 
-                                BitmapPreloadCache.put(url, resource);
-                                android.util.Log.d("Preload", "预加载成功(BITMAP): " + url);
-                            }
+                            BitmapPreloadCache.put(url, resource);
+                            android.util.Log.d("Preload", "预加载成功(BITMAP): " + url);
+                        }
 
-                            @Override
-                            public void onLoadCleared(@Nullable Drawable placeholder) {
-                            }
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        }
 
-                            @Override
-                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                android.util.Log.e("Preload", "预加载失败: " + url);
-                            }
-                        });
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            android.util.Log.e("Preload", "预加载失败: " + url);
+                        }
+                    });
 
             } catch (Exception e) {
                 android.util.Log.w("Preload", "预加载异常: " + url);
