@@ -1,10 +1,11 @@
 # TikTok-LifeService-Page
 ## A simple TikTok LifeService Page（Android）
 一个仿TikTok经验分享频道的Android原生应用，采用瀑布流布局展示图文内容，支持单双列切换、智能预加载、网络缓存等功能。
+### 架构模式 : MVC
 ## ✨ 功能特性
 ### 核心功能
 - 🎨 **双列瀑布流布局**：RecyclerView + StaggeredGridLayoutManager 实现
-- 🔄 **单双列切换**：支持一键切换单列/双列模式，布局偏好本地持久化
+- 🔄 **单双列切换**：支持一键切换单列/双列模式
 - 📥 **下拉刷新，上拉加载**：SwipeRefreshLayout + 滚动监听实现分页加载
 - ⚡ **智能图片预加载**：自定义预加载策略，提前加载可见区域外的图片
 - 🌐 **真实网络数据**：Picsum 获取真实图片
@@ -32,6 +33,8 @@ com.example.demo_tt/
 
 ├── MyApplication.java # Application类(开屏页面加载)
 
+├── BitmapPreloadCache.java # Bitmap预解码缓存
+
 └── MyGlideModule.java # Glide配置模块（内存缓存，磁盘缓存）
 ## 🎯 核心功能实现
 
@@ -41,6 +44,8 @@ com.example.demo_tt/
 - 防止item位置跳动(`GAP_HANDLING_NONE`)
 - 支持动态切换列数(1列/2列)
 ### 2. 智能预加载
+**流程**：在滑动时记录位置，判断是否达到预加载条件，停止滑动时进行加载
+
 **效果**：用户滑动时图片瞬间显示，无白屏（可根据网速适当跳帧预加载卡片多少）
 ### 3. 网络检查
 如果网络断开直接显示提示
@@ -54,4 +59,5 @@ com.example.demo_tt/
 - ✅ 禁用item动画
 - ✅ 图片尺寸限制(override)
 - ✅ Glide多级缓存
-- ✅ 智能预加载策略
+- ✅ 停止滚动时智能预加载
+- ✅ Bitmap缓存
