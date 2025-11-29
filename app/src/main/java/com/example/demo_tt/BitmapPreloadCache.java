@@ -5,15 +5,14 @@ import android.util.LruCache;
 
 public class BitmapPreloadCache {
 
-    private static final int MAX_COUNT = 50; // 缓存大小
-
+    private static final int MAX_CACHE_SIZE_BYTES = (int)(Runtime.getRuntime().maxMemory() / 8);
     private static final LruCache<String, Bitmap> cache =
-            new LruCache<String, Bitmap>(MAX_COUNT) {
-                @Override
-                protected int sizeOf(String key, Bitmap value) {
-                    return 1;
-                }
-            };
+        new LruCache<String, Bitmap>(MAX_CACHE_SIZE_BYTES) {
+            @Override
+            protected int sizeOf(String key, Bitmap value) {
+                return value.getByteCount();
+            }
+        };
 
     public static Bitmap get(String key) {
         return cache.get(key);

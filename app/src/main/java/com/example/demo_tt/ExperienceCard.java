@@ -1,6 +1,5 @@
 package com.example.demo_tt;
 
-import java.security.KeyStore;
 import java.util.Random;
 public class ExperienceCard {
     // init

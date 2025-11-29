@@ -30,7 +30,7 @@ public class MyGlideModule extends AppGlideModule {
         builder.setMemoryCache(new LruResourceCache(memoryCacheSize));
 
         // 设置磁盘缓存
-        int diskCacheSizeBytes = 1024 * 1024 * 250;  // MB
+        int diskCacheSizeBytes = 1024 * 1024 * 250;  // 250 MB
         builder.setDiskCache(new InternalCacheDiskCacheFactory(context, diskCacheSizeBytes));
         android.util.Log.d("GlideConfig", "内存缓存大小: " + (memoryCacheSize / 1024 / 1024) + " MB");
         android.util.Log.d("GlideConfig", "磁盘缓存大小: 250 MB");
